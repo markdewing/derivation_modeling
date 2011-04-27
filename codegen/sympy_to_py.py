@@ -140,14 +140,14 @@ def expr_to_py(e):
     if m(numbers.Pi):
         return py_var("math.pi")
 
-    if m(Indexed, (IndexedBase, v.e1), (Idx, v.e2)):
+    if m(Indexed, (IndexedBase, v.e1), v.e2):
         global index_trans
         if str(v.e1) in index_trans:
             idx_var,idx_expr = index_trans[str(v.e1)]
             ex = expr_to_py(idx_expr.subs(idx_var,v.e2))
             return ex
         return None
-        
+
 
     # alternate syntax for the pattern match?
     #if m(Pow, v.e1 ** v.e2):
