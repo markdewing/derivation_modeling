@@ -40,6 +40,15 @@ class identity(object):
         eqn = Eq(eqn.args[0],self.transform(eqn.args[1]))
         return eqn
 
+class doit(object):
+    '''Evaluate unevaluated terms on the rhs'''
+
+    def __call__(self, eqn):
+        eqn = Eq(eqn.args[0],eqn.args[1].doit())
+        return eqn
+    
+
+
 class replace(object):
     '''Replace values'''
     def __init__(self, v1, v2):
@@ -110,7 +119,8 @@ def all_to_xhtml():
         for c in g.children:
             print '  children:  ',c.name, 
         print '' 
-        g.to_xhtml()
+        #g.to_xhtml()
+        g.to_mathjax()
 
 
 class derivation(object):
@@ -122,17 +132,32 @@ class derivation(object):
         self.parent = None
         self.title = None
         self.children = []
+        self.definitions = []
+        self.output_name = ""
+        self.attach_aux = []  # auxiliary equations or functions
         global_derivation_list.append(self)
 
     def add_step(self, operation, description=''):
+        ''' Add a derivation step.  The 'operation' can be a single item, or a list
+            of items applied in one step.
+        '''
         self.steps.append((operation, description))
-        self.eqns.append(operation(self.eqns[-1]))
+        try:
+            new_eqn = self.eqns[-1]
+            for op in operation:
+                new_eqn = op(new_eqn)
+            self.eqns.append(new_eqn)
+        except TypeError: 
+            self.eqns.append(operation(self.eqns[-1]))
 
     def set_name(self, name):
         self.name = name
 
     def set_title(self, title):
         self.title = title
+
+    def set_output_name(self, output_name):
+        self.output_name = output_name
 
     def final(self):
         return self.eqns[-1]
@@ -142,6 +167,14 @@ class derivation(object):
         d.parent = self
         return d
 
+    def add_definition(self, definition, description=''):
+        '''Add a definition, either used in the derivation, or to be replaced later'''
+        self.definitions.append((definition, description))
+
+    def add_aux(self, symbol, declaration):
+        '''Add equations that are not replaced (function calls)'''
+        self.attach_aux.append( (symbol, declaration) )
+
     def do_print(self):
         for (s,e) in zip(self.steps,self.eqns):
             print e,s[1]
@@ -150,10 +183,22 @@ class derivation(object):
     def to_xhtml(self):
         xd = xml_doc()
         xd.add_css(".math {position:relative; left: 40px;}")
+        xd.add_css(".definition {position:relative; left: 40px;}")
         if self.title:
             xd.create_child_text_element(xd.body_node,'h1',self.title)
+        if len(self.definitions) > 0:
+            defi = xd.create_child_element(xd.body_node,'p')
+            xd.create_child_text_element(defi,'h2','Definitions')
+            for (idx,d) in enumerate(self.definitions):
+                c = xd.create_child_element(defi,'p')
+                #div = xd.create_child_element(c,'div')
+                xd.add_math(c,d[0])
+                span = xd.create_child_text_element(c,'span',d[1])
+                span.setAttribute('class','definition')
+        deriv = xd.create_child_element(xd.body_node,'p')
+        xd.create_child_text_element(deriv,'h2','Derivation')
         for (idx,(s,e)) in enumerate(zip(self.steps,self.eqns)):
-            c = xd.create_child_element(xd.body_node,'p')
+            c = xd.create_child_element(deriv,'p')
             xd.create_child_text_element(c,'p',s[1])
             d = xd.create_child_element(c,'div')
             if idx > 0:
@@ -172,6 +217,52 @@ class derivation(object):
         s = xd.toprettyxml()
         #f = codecs.open('tmp.xhtml','w','UTF-8',errors='backslashreplace')
         f = codecs.open(self.name+'.xhtml','w','UTF-8',errors='backslashreplace')
+        f.write(s)
+        f.close()
+
+    def to_mathjax(self):
+        xd = xml_doc(add_mathml=False)
+        xd.add_css(".math {position:relative; left: 40px;}")
+        xd.add_css(".definition {position:relative; left: 40px;}")
+        xd.add_script()
+        if self.title:
+            xd.create_child_text_element(xd.body_node,'h1',self.title)
+        if len(self.definitions) > 0:
+            defi = xd.create_child_element(xd.body_node,'p')
+            xd.create_child_text_element(defi,'h2','Definitions')
+            for (idx,d) in enumerate(self.definitions):
+                c = xd.create_child_element(defi,'p')
+                #div = xd.create_child_element(c,'div')
+                xd.add_math(c,d[0])
+                span = xd.create_child_text_element(c,'span',d[1])
+                span.setAttribute('class','definition')
+        deriv = xd.create_child_element(xd.body_node,'p')
+        xd.create_child_text_element(deriv,'h2','Derivation')
+        for (idx,(s,e)) in enumerate(zip(self.steps,self.eqns)):
+            c = xd.create_child_element(deriv,'p')
+            xd.create_child_text_element(c,'p',s[1])
+            d = xd.create_child_element(c,'div')
+            if idx > 0:
+                d.setAttribute('class','math')
+            xd.add_math(d,e)
+        if self.parent:
+            parent_file = self.parent.name  + '.html'
+            #xd.create_child_text_element(xd.body_node,'p','Parent: ' + self.parent.name)
+            ln = xd.create_child_text_element(xd.body_node,'p','Parent: ')
+            xd.create_link_node(ln,self.parent.name+'.html',self.parent.name)
+        for c in self.children:
+            ln = xd.create_child_text_element(xd.body_node,'p','Children: ')
+            xd.create_link_node(ln,c.name+'.html',c.name)
+        for (sym,decl) in self.attach_aux:
+            ln = xd.create_child_text_element(xd.body_node,'p','Aux: ')
+            xd.create_link_node(ln,decl.name+'.html',str(sym) + " = " + decl.name)
+            
+        #f = open("tmp.xhtml",'w')
+        #s = convert_symbols(xd.toprettyxml(),do_html=True)
+        s = xd.toprettyxml()
+        #s = xd.toxml()
+        #f = codecs.open('tmp.xhtml','w','UTF-8',errors='backslashreplace')
+        f = codecs.open(self.name+'.html','w','UTF-8',errors='backslashreplace')
         f.write(s)
         f.close()
         
