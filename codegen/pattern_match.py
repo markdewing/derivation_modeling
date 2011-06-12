@@ -23,6 +23,11 @@ class Match(object):
     def type(self, value):
         '''Match on the type of the expression type'''
         return isinstance(type(self.expr),value)
+
+    def exact(self, value):
+        '''Match exact values, for singletons'''
+        return value == self.expr
+
     def __call__(self, *args):
         '''Match on first arg as an expression type, next args bind to expression args'''
         match = True
