@@ -35,8 +35,8 @@ class c_base(object):
 
 def is_add(e):
     if isinstance(e,c_expr):
-        if e.op == c_expr.C_OP_PLUS: 
-            return True 
+        if e.op == c_expr.C_OP_PLUS:
+            return True
         if e.op == c_expr.C_OP_MINUS and e._args[1] != None:
             return True
     return False
@@ -47,10 +47,10 @@ def is_add(e):
 #        self.is_pointer = is_pointer
 #        self.is_reference = is_reference
 #    def to_string(self):
-#        if self.is_pointer: 
-#            return self.type + "*" 
-#        if self.is_reference: 
-#            return self.type + "&" 
+#        if self.is_pointer:
+#            return self.type + "*"
+#        if self.is_reference:
+#            return self.type + "&"
 #        return self.type
 
 class c_type(object):
@@ -106,7 +106,7 @@ class c_typedef(c_base):
 
 class c_var(c_base):
     def __init__(self, name, type=None):
-        c_base.__init__(self) 
+        c_base.__init__(self)
         self.name = name
         self.type = type
     def to_string(self, **kw):
@@ -122,7 +122,7 @@ class c_var(c_base):
 
 class c_num(c_base):
     def __init__(self, val):
-        c_base.__init__(self) 
+        c_base.__init__(self)
         self.val = val
     def to_string(self, **kw):
         return str(self.val)
@@ -141,8 +141,8 @@ class c_num(c_base):
 
 class c_expr(c_base):
     C_OP_PLUS = '+'
-    C_OP_MINUS = '-' 
-    C_OP_TIMES = '*' 
+    C_OP_MINUS = '-'
+    C_OP_TIMES = '*'
     C_OP_DIVIDE = '/'
     C_OP_LT = '<'
     C_OP_PREINCR  = '++'
@@ -163,22 +163,22 @@ class c_expr(c_base):
 
     def to_string(self, **kw):
         out = ''
-        
+
         child_need_paren = False
         if (self.op == c_expr.C_OP_TIMES or
             self.op == c_expr.C_OP_DIVIDE):
             if self._args[0] and self._args[0].contains(is_add):
-                child_need_paren = True 
+                child_need_paren = True
             if self._args[1] and self._args[1].contains(is_add):
-                child_need_paren = True 
+                child_need_paren = True
 
         arg1_str = '<no arg1>'
         if len(self._args) > 0:
-            arg1_str = self._args[0].to_string(need_paren=child_need_paren) 
+            arg1_str = self._args[0].to_string(need_paren=child_need_paren)
 
         arg2_str = ''
         if len(self._args) > 1:
-            arg2_str = self._args[1].to_string(need_paren=child_need_paren) 
+            arg2_str = self._args[1].to_string(need_paren=child_need_paren)
 
         need_paren = kw.get('need_paren',False)
 
@@ -193,7 +193,7 @@ class c_expr(c_base):
         if need_paren:
             out += ')'
 
-        return out 
+        return out
 
 def bind(obj, *arg, **kw):
     return functools.partial(obj, *arg, **kw)
@@ -222,8 +222,8 @@ class c_assign(c_base):
         return functools.partial(c_assign,op=self._op)
 
     def to_string(self, **kw):
-        lhs = self._args[0] 
-        rhs = self._args[1] 
+        lhs = self._args[0]
+        rhs = self._args[1]
         out = get_indent(**kw)
         if lhs:
             out += lhs.to_string(**kw)
@@ -269,20 +269,20 @@ class c_for(c_base):
             out += a.to_string(**kw)
         out += indent + '}\n'
         return out
-        
-        
+
+
 class c_block(c_base):
     def __init__(self, *args):
         c_base.__init__(self)
         self.add_statement(*args)
-        
+
     def add_statement(self, *stmts):
         self._args.extend(stmts)
 
     def to_string(self, **kw):
-        out = '' 
+        out = ''
         for a in self._args:
-            out += a.to_string(indent=c_indent_spaces, **kw) 
+            out += a.to_string(indent=c_indent_spaces, **kw)
         return out
 
 class c_stmt(c_base):
@@ -304,9 +304,6 @@ class c_string(c_base):
 
     def to_string(self, **kw):
         return '"' + self._val + '"'
-        
-        
-               
 
 
 class c_function_def(c_base):
@@ -334,12 +331,12 @@ class c_declaration(c_base):
         self.type = type
 
     def to_string(self, **kw):
-        out = str(self.type)%{'name':str(self.name)} 
+        out = str(self.type)%{'name':str(self.name)}
         return out
 
 class c_func_type(c_base):
     def __init__(self, ret_type, *args):
-        c_base.__init__(self) 
+        c_base.__init__(self)
         self._args.append(ret_type)
         self._args.extend(args)
 
@@ -357,12 +354,12 @@ class c_func_decl(c_base):
     def __init__(self, func_type):
         c_base.__init__(self)
         self._args.append(func_type)
-    
+
     def to_string(self, **kw):
         out = self._args[0].to_string()
         out += ";\n"
         return out
-         
+
 class c_return(c_base):
     def __init__(self, arg=None):
         c_base.__init__(self)
@@ -371,14 +368,14 @@ class c_return(c_base):
 
     def to_string(self, **kw):
         out = get_indent(**kw) + "return"
-        if len(self._args) > 0: 
+        if len(self._args) > 0:
             out += " " + str(self._args[0])
         out += ";\n"
         return out
-    
+
 class c_function_call(c_base):
     def __init__(self, name, *args):
-        c_base.__init__(self) 
+        c_base.__init__(self)
         self.name = name
         self._args.extend(args)
 
@@ -453,5 +450,5 @@ def test_void_func():
 
 
 if __name__ == '__main__':
-    #test_include() 
+    #test_include()
     test_void_func()

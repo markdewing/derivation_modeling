@@ -1,5 +1,5 @@
 
-from sympy import * 
+from sympy import *
 
 class AutoVarInstance(object):
     def __init__(self, parent, name):
@@ -57,13 +57,13 @@ class Match(object):
                 a.parent.__dict__[name] = e
 
         return match
-            
+
 
 
 if __name__ == '__main__':
     pass
+
  
-    
 
 
 

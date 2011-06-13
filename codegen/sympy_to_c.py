@@ -4,37 +4,10 @@ from lang_c import *
 from pattern_match import AutoVar,AutoVarInstance,Match
 from transforms import extract_free_variables, extract_sum
 
-#def expr_to_c(e, **kw):
-#    v = AutoVar()
-#    m = Match(e)
-#
-#    if m(Add, v.e1, v.e2):
-#        return c_expr(c_expr.C_OP_PLUS, expr_to_c(v.e1,**kw), expr_to_c(v.e2,**kw))
-#
-#    # reciprocal
-#    if m(Pow, v.e2, S.NegativeOne):
-#        return c_expr(c_expr.C_OP_DIVIDE, c_num(1.0), expr_to_c(v.e2))
-#
-#    # division
-#    if m(Mul, v.e1, (Pow, v.e2, S.NegativeOne)):
-#        return c_expr(c_expr.C_OP_DIVIDE, expr_to_c(v.e1), expr_to_c(v.e2))
-#
-#    if m(Mul, v.e1, v.e2):
-#        return c_expr(c_expr.C_OP_TIMES, expr_to_c(v.e1), expr_to_c(v.e2))
-#
-#    if m(Symbol):
-#        return c_var(str(e))
-#
-#    if m(Integer):
-#        return c_num(e.p)
-#
-#    print 'no match',type(e)
-#    return None
-
 def sum_to_c(e, **kw):
     v = AutoVar()
     m = Match(e)
-    
+
     ec = expr_to_c(**kw)
     if m(Sum, v.e1, v.e2):
         lower_limit = ec(v.e2[1])
@@ -64,20 +37,20 @@ class expr_to_c(object):
         # subtraction
         if m(Add, v.e1, (Mul, S.NegativeOne, v.e2)):
             return c_sub(self(v.e1), self(v.e2))
-    
+
         if m(Add, v.e1, v.e2):
             #return c_expr(c_expr.C_OP_PLUS, self(v.e1), self(v.e2))
             return c_add(self(v.e1), self(v.e2))
-    
+
         # reciprocal
         if m(Pow, v.e2, S.NegativeOne):
             return c_expr(c_expr.C_OP_DIVIDE, c_num(1.0), self(v.e2))
-    
+
         # division
         if m(Mul, v.e1, (Pow, v.e2, S.NegativeOne)):
             #return c_expr(c_expr.C_OP_DIVIDE, self(v.e1), self(v.e2))
             return c_div(self(v.e1), self(v.e2))
-    
+
         if m(Mul, v.e1, v.e2):
             return c_expr(c_expr.C_OP_TIMES, self(v.e1), self(v.e2))
 
@@ -87,7 +60,8 @@ class expr_to_c(object):
         if m(Pow, v.e1, v.e2):
             return c_function_call('pow', self(v.e1), self(v.e2))
 
-        if m(Indexed, (IndexedBase, v.e1), (Idx, v.e2)):
+        #if m(Indexed, (IndexedBase, v.e1), (Idx, v.e2)):
+        if m(Indexed, (IndexedBase, v.e1), v.e2):
             if str(v.e1) in self._index_trans:
                 idx_var, idx_expr = self._index_trans[str(v.e1)]
                 ex = self(idx_expr.subs(idx_var, v.e2))
@@ -101,7 +75,7 @@ class expr_to_c(object):
             if name in self._func_trans:
                 name = self._func_trans[name]
             return c_function_call(name, *args)
-    
+
         if m(Symbol):
             #if str(e) in self._scope:
             #    return self._scope[str(e)]
@@ -119,7 +93,7 @@ class expr_to_c(object):
 
         if m(Real):
             return c_num(e.num)
-    
+
         print 'no match',type(e)
         return None
 
@@ -132,13 +106,13 @@ def convert(e, definitions=[], func_name='func', extra_args=[], index_trans={}, 
     #func_args = [c_var(str(a)) for a in sorted(free_vars,key=lambda x:str(x))]
     func_args = []
     for a in sorted(free_vars,key=lambda x:str(x)):
-        if a.is_Integer: 
+        if a.is_Integer:
             func_args.append(c_int(str(a)))
         elif str(a) == 'f':
             func_args.append(c_var(str(a),c_type(kw['func_type_name'])))
         else:
             func_args.append(c_double(str(a)))
-     
+
     func_args.extend([c_double(a) for a in extra_args])
 
     func_type = c_func_type(c_double(func_name), *func_args)
@@ -167,18 +141,18 @@ def convert(e, definitions=[], func_name='func', extra_args=[], index_trans={}, 
         final = c_assign(c_double('final'), ep)
     body.add_statement(final)
     body.add_statement(c_return(c_var('final')))
-    
+
     return fd, c_block(func_typedef, func_decl)
 
 def convert_simple_func(e, func_name='func', extra_args=[]):
     free_vars = extract_free_variables(e)
     func_args = []
     for a in sorted(free_vars,key=lambda x:str(x)):
-        if a.is_Integer: 
+        if a.is_Integer:
             func_args.append(c_int(str(a)))
         else:
             func_args.append(c_double(str(a)))
-     
+
     func_args.extend([c_double(a) for a in extra_args])
 
     func_type = c_func_type(c_double(func_name), *func_args)
@@ -192,9 +166,9 @@ def convert_simple_func(e, func_name='func', extra_args=[]):
     fd = c_function_def(func_type, body)
 
     body.add_statement(c_return(ep))
-    
+
     return fd
-   
+
 
 if __name__ == '__main__':
     a = Symbol('a')

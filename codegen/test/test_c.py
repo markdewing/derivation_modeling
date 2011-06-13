@@ -6,7 +6,7 @@ def test_var():
     assert str(a) == 'a'
     b = c_int('b')
     assert str(b) == 'int b'
-    
+
 
 def test_type():
     i1 = c_type('int')

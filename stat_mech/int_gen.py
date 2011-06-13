@@ -6,7 +6,7 @@ from sympy.prototype.codegen.sympy_to_py import *
 # convert an integral
 
 
-def convert_integral(e):
+def convert_integral(e, transforms=[]):
     var_list = [str(d[0]) for d in e.limits]
 
     import_list = ['trap'+str(i) for i in range(len(var_list))]
@@ -29,6 +29,15 @@ def convert_integral(e):
     #    f.add_method(call)
     #    class_list.append(f)
 
+    ft = {}
+    for sym,decl in transforms:
+        f = decl.final().rhs
+        name = decl.output_name
+        print 'generating', name
+        func = convert_simple_func(f, func_name=name)
+        class_list.append(func)
+        ft[str(sym)] = name
+
     n = py_var('n')
     for idx,v in enumerate(var_list[:-1]):
         inp_args = [py_var(arg) for arg in var_list[:idx+1]]
@@ -45,7 +54,7 @@ def convert_integral(e):
     v = var_list[-1]
     args = [py_var(a) for a in var_list]
     func = py_function_def('f_'+v,py_arg_list(*args))
-    body = py_return_stmt(expr_to_py(e.function))
+    body = py_return_stmt(expr_to_py(func_trans=ft)(e.function))
     func.add_statement(body)
     class_list.append(func)
 
@@ -80,7 +89,7 @@ def convert_one_integral(e):
     # create function
     int_var = e.limits[0][0]
     func = py_function_def(py_var('f'),py_arg_list(py_var(str(int_var))))
-    body = py_return_stmt(expr_to_py(e.function))
+    body = py_return_stmt(expr_to_py()(e.function))
     func.add_statement(body)
 
 

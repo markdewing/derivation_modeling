@@ -1,5 +1,5 @@
 
-from sympy import * 
+from sympy import *
 from pattern_match import AutoVar,AutoVarInstance,Match
 
 # Common tree matching and transform functions
@@ -9,7 +9,7 @@ def find_func(func, e):
     m = Match(e)
     if m(func):
         return [e]
-    
+
     fs = []
     for n in e.args:
         fs.extend(find_func(func, n))
@@ -27,7 +27,7 @@ def extract_sum(e):
     if (len(e.args)) == 0:
         return (None,e)
 
-    # default 
+    # default
     arg = e.args
     sum = None
     new_args = []
@@ -36,9 +36,9 @@ def extract_sum(e):
         if sums:
             sum = sums
         #if other:
-        new_args.append(other) 
+        new_args.append(other)
         #if not other:
-        #    other = Symbol('total') 
+        #    other = Symbol('total')
 
 
     return (sum, e.new(*new_args))
@@ -47,10 +47,10 @@ def extract_sum(e):
 class extract_integrals:
     def __init__(self):
         self.idx = 0
-        
+
     def __call__(self, e):
         m = Match(e)
-    
+
         if m(Integral):
             name = 'val' + str(self.idx)
             ret = ([(name,e)], Symbol(name))
@@ -62,20 +62,20 @@ class extract_integrals:
         if (len(e.args)) == 0:
             return ([],e)
 
-        # default 
+        # default
         arg = e.args
         ints = []
         new_args = []
         for a in arg:
             (new_ints, other) = self(a)
             ints.extend(new_ints)
-            new_args.append(other) 
+            new_args.append(other)
             #if not other:
-            #    other = Symbol('total') 
+            #    other = Symbol('total')
 
         return (ints, e.new(*new_args))
 
-    
+
 
 
 # returns set of free variables (and functions)
@@ -83,7 +83,7 @@ def extract_free_variables(e):
     m = Match(e)
 
     if m(Sum):
-        limit_var = e.limits[0][0] 
+        limit_var = e.limits[0][0]
         vars = extract_free_variables(e.function)
         lower = extract_free_variables(e.limits[0][1])
         upper = extract_free_variables(e.limits[0][2])
@@ -96,22 +96,22 @@ def extract_free_variables(e):
     if m(Symbol):
         return set([e])
 
-    if m.type(FunctionClass): 
+    if m.type(FunctionClass):
         return set([type(e)])
 
     # not sure how to express this any better?
     if (len(e.args)) == 0:
         return set([])
 
-    # default 
+    # default
     arg = e.args
     free_vars = set()
     for a in arg:
         other = extract_free_variables(a)
-        free_vars.update(other) 
+        free_vars.update(other)
 
     return free_vars
-    
+
 
 if __name__ == '__main__':
     x = Symbol('x')
