@@ -122,7 +122,8 @@ trap.add_step(identity(split_sum),'Split sum')
 trap.add_step(identity(adjust_limits),'Adjust limits')
 trap.add_step(identity(peel_terms),'Peel terms')
 
-trap.to_xhtml()
+#trap.to_xhtml()
+trap.to_mathjax()
 
 if __name__ == '__main__':
     trap.do_print()

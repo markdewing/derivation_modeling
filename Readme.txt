@@ -1,5 +1,24 @@
 
+Running the examples
+--------------------
 
+To get html output, run
+  quadrature/trapezoid.py - produces trapezoidal_int.html
+  stat_mech/int_lj_n2d2.py - produces partition.html, specialize_n2d2.html, lj_n2.html, and lennard-jones.html
+ If you open partition.html, the next two pages (specialize_n2d2.html and lj_n2.html) are linked from it.
+
+To get python code, run
+  quadrature/convert_trap.py - produces ptrap_gen.py
+  stat_mech/final.py - produces do_int.py (which imports ptrap_gen.py)
+
+To get C code, run
+  quadrature/c_convert_trap.py - produces ctrap_gen.h and ctrap_gen.cpp
+  stat_mech/c_final.py - produces main_int.cpp
+    Compile main_int.cpp and ctrap_gen.cpp to get an executable
+
+
+Contents
+--------
 
 derivation.py - model a derivation and all various operational steps
 
