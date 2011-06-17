@@ -49,6 +49,8 @@ stat_mech/
        Also specify the temperature and box size to make the integral completely numerical.
   
 
+example_codegen.py - The classical 'Hello World' program in the C and python trees.  Run it to generated hello_py.py and hello_c.c.
+
 codegen/
   lang_py.py - Python language model
   pattern_match.py - experiment in pattern-matching syntax for converting sympy trees to other forms

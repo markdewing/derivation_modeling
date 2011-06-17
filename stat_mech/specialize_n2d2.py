@@ -45,5 +45,5 @@ n2.add_step(do_integral(Vol, [r_12]),'Integrate out r_cm (this step is still a h
 L = Symbol('L')
 n2.add_step(identity(decompose),'Decompose into vector components')
 # Lower limit is small, rather than 0 to avoid a division by zero error at the origin.
-n2.add_step(identity(add_limits(0.00001,L)),'Add integration limits')
+n2.add_step(identity(add_limits(-L/2,L/2)),'Add integration limits')
 

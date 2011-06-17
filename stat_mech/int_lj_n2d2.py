@@ -13,8 +13,9 @@ lj_eqn = lj_pot.final()
 lj_n2.add_step(replace_func(V12,lj_eqn),'Specialize to the LJ potential')
 
 
-lj_n2.add_step(replace('L',1.0),'Insert value for box size')
-lj_n2.add_step(replace('Omega',1.0),'Insert value for box volume')
+L = 2.0
+lj_n2.add_step(replace('L',L),'Insert value for box size')
+lj_n2.add_step(replace('Omega',L*L),'Insert value for box volume')
 lj_n2.add_step(replace('beta',1.0),'Insert value for temperature')
 
 
