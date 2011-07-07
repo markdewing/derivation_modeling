@@ -4,6 +4,47 @@ from sympy.prototype.codegen.lang_py import *
 from sympy.prototype.codegen.sympy_to_py import *
 
 # convert an integral
+def convert_main(e, transforms=[]):
+
+    ft = {}
+    for sym,decl in transforms:
+        f = decl.final().rhs
+        name = decl.output_name
+        print 'generating', name
+        func = convert_simple_func(f, func_name=name)
+        class_list.append(func)
+        ft[str(sym)] = name
+
+
+    #trap_import = py_import('ptrap_gen',False, *import_list)
+    math_import = py_import('math')
+    #class_list = [trap_import,math_import]
+    imports = [math_import]
+    #class_list = [math_import]
+
+    n = py_var('n')
+    #define_n = py_assign_stmt(n,py_num(10))
+
+    #call = py_function_call('trap0',py_arg_list(py_var(a), py_var(b), py_var('f_'+var_list[0]),n))
+
+    v = py_var('v')
+    ep = expr_to_py(func_trans=ft)
+    call = ep(e)
+    imports.extend(ep._imports)
+    class_list = imports
+    class_list.extend(ep._pre_functions)
+    int_val = py_assign_stmt(v,call)
+    print_val = py_print_stmt(v)
+ 
+
+    define_n = py_assign_stmt(n,py_num(10))
+    #class_list.append(f)
+    class_list.append(define_n)
+    class_list.append(int_val)
+    class_list.append(print_val)
+    
+
+    return py_stmt_block(*class_list)
 
 
 def convert_integral(e, transforms=[]):

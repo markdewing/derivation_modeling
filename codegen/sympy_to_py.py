@@ -19,23 +19,20 @@ def convert(e,definitions=[], func_name='func', extra_args=[], index_trans={}):
     func_args = [py_var(str(a)) for a in sorted(free_vars,key=lambda x:str(x))]
     func_args.extend([py_var(a) for a in extra_args])
 
-    # break expression into the sum (and children) and everything else (above the sum)
-    (sum, other) = extract_sum(e)
-    ep = expr_to_py(extra_args=extra_args, index_trans=index_trans)(other)
+    epy = expr_to_py(extra_args=extra_args, index_trans=index_trans)
+    ep = epy(e)
 
-    init = py_assign_stmt(py_var('total'),py_num(0),py_assign_stmt.PY_ASSIGN_EQUAL)
-    sum = sum_to_py(sum, extra_args=extra_args, index_trans=index_trans)
     fd = py_function_def(func_name,py_arg_list(*func_args))
     for d in definitions:
         define = py_assign_stmt(py_var(str(d.lhs)), expr_to_py()(d.rhs), py_assign_stmt.PY_ASSIGN_EQUAL)
         fd.add_statement(define)
-    fd.add_statement(init,sum)
-    if other:
-        final = py_assign_stmt(py_var('final'),ep,py_assign_stmt.PY_ASSIGN_EQUAL)
-    fd.add_statement(final)
-    fd.add_statement(py_return_stmt(py_var('final')))
+    fd.add_statement(*epy._pre_statements)
+    fd.add_statement(py_return_stmt(ep))
 
     return fd
+
+
+
 
 def sum_to_py(e, **kw):
     v = AutoVar()
@@ -47,7 +44,7 @@ def sum_to_py(e, **kw):
         upper_limit = ep((v.e2[2]+1))
         body = py_assign_stmt(py_var('total'),ep(v.e1),py_assign_stmt.PY_ASSIGN_PLUS)
         loop =  py_for(ep(v.e2[0]),py_function_call('range',lower_limit,upper_limit),body)
-        return loop
+        return loop 
 
 class expr_to_py(object):
     '''Convert sympy expression to python syntax tree'''
@@ -60,6 +57,12 @@ class expr_to_py(object):
 
         # Function's name that should be used in the generated code
         self._func_trans = func_trans
+
+
+        # Items that should go before the current statement
+        self._pre_functions = []
+        self._pre_statements = []
+        self._imports = []
 
     def __call__(self, e):
         v = AutoVar()
@@ -115,13 +118,28 @@ class expr_to_py(object):
                 name = self._func_trans[name]
             return py_function_call(name, *args)
 
+
+        if m(Integral):
+            return self.convert_integral(e)
+
+        if m(Sum, v.e1, v.e2):
+            init = py_assign_stmt(py_var('total'),py_num(0),py_assign_stmt.PY_ASSIGN_EQUAL)
+
+            lower_limit = self(v.e2[1])
+            upper_limit = self((v.e2[2]+1))
+            body = py_assign_stmt(py_var('total'),self(v.e1),py_assign_stmt.PY_ASSIGN_PLUS)
+            loop =  py_for(self(v.e2[0]),py_function_call('range',lower_limit,upper_limit),body)
+            self._pre_statements.append(init)
+            self._pre_statements.append(loop)
+            return py_var('total')
+
         if m(Symbol):
             return py_var(str(e))
 
         if m(Integer):
             return py_num(e.p)
 
-        if m(Real):
+        if m(Float):
             return py_num(e.num,promote_to_fp=True)
 
         # alternate syntax for the pattern match?
@@ -130,6 +148,44 @@ class expr_to_py(object):
         if m(Rational):
             (n,d) = e.as_numer_denom()
             return py_expr(py_expr.PY_OP_DIVIDE, py_num(n), py_num(d, True))
+
+# convert multidimensional integral as iterated integral
+    def convert_integral(self, e):
+        var_list = [str(d[0]) for d in e.limits]
+    
+        import_list = ['trap'+str(i) for i in range(len(var_list))]
+        trap_import = py_import('ptrap_gen',False, *import_list)
+        self._imports.append(trap_import)
+    
+    
+        n = py_var('n')
+        for idx,v in enumerate(var_list[:-1]):
+            inp_args = [py_var(arg) for arg in var_list[:idx+1]]
+            f = py_function_def('f_'+v,py_arg_list(*inp_args))
+            a = str(e.limits[idx+1][1])
+            b = str(e.limits[idx+1][2])
+            other_args = [py_var(arg) for arg in var_list[:idx+1]]
+            trap_call = py_function_call('trap'+str(idx+1),py_arg_list(py_var(a), py_var(b), py_var('f_'+var_list[idx+1]),n,*other_args))
+            f.add_statement(py_assign_stmt(py_var('v'),trap_call))
+            f.add_statement(py_return_stmt(py_var('v')))
+            self._pre_functions.append(f)
+    
+        # generate the innermost routine, the one that actually evaluates the function 
+        v = var_list[-1]
+        args = [py_var(a) for a in var_list]
+        func = py_function_def('f_'+v,py_arg_list(*args))
+        body = py_return_stmt(self(e.function))
+        func.add_statement(body)
+        self._pre_functions.append(func)
+    
+    
+        a = str(e.limits[0][1])
+        b = str(e.limits[0][2])
+        #define_n = py_assign_stmt(n,py_num(10))
+        call = py_function_call('trap0',py_arg_list(py_var(a), py_var(b), py_var('f_'+var_list[0]),n))
+        
+        return call
+        #return {'core':call, 'pre':class_list}
 
 def convert_simple_func(e, func_name='func', extra_args=[]):
     free_vars = extract_free_variables(e)

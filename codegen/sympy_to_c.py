@@ -91,7 +91,7 @@ class expr_to_c(object):
         if m(Integer):
             return c_num(e.p)
 
-        if m(Real):
+        if m(Float):
             return c_num(e.num)
 
         print 'no match',type(e)

@@ -1,8 +1,11 @@
 
 # Represent a simple 'Hello, World' program using the python and C trees
 
-from sympy.prototype.codegen.lang_py import *
-from sympy.prototype.codegen.lang_c import *
+from sympy.prototype.codegen.lang_py import py_expr, py_expr_stmt, py_function_call, py_function_def, \
+    py_if, py_print_stmt, py_stmt_block, py_string, py_var
+from sympy.prototype.codegen.lang_c import c_block, c_function_call, c_function_def, c_func_type, \
+    c_int, c_num, c_return, c_stmt, c_string, pp_include
+
 
 def example_python():
     body = py_stmt_block()

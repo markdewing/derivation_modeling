@@ -41,7 +41,7 @@ def extract_sum(e):
         #    other = Symbol('total')
 
 
-    return (sum, e.new(*new_args))
+    return (sum, e.func(*new_args))
 
 # returns a list of expressions
 class extract_integrals:
@@ -73,7 +73,7 @@ class extract_integrals:
             #if not other:
             #    other = Symbol('total')
 
-        return (ints, e.new(*new_args))
+        return (ints, e.func(*new_args))
 
 
 

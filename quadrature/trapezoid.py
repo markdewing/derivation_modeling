@@ -49,7 +49,7 @@ def rewrite(s,rules):
             terms.append(r[1](t))
         else:
             terms.append(t)
-    return s.new(*terms)
+    return s.func(*terms)
 
 def get_index(term):
     for p in preorder_traversal(term):
@@ -65,7 +65,7 @@ def adjust_index(s,adjust):
 def adjust_limit(s):
     v = s.function
     #adjust = get_index(v).args[0].extract_additively('i')
-    adjust = get_index(v).extract_additively('i')
+    adjust = get_index(v).extract_additively(i)
     new_s = adjust_index(s,-adjust)
     return new_s
 

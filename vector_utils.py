@@ -44,7 +44,7 @@ class replace_func(object):
         for a in arg:
             other = self(a)
             new_args.append(other)
-        r = e.new(*new_args)
+        r = e.func(*new_args)
         return r
 
 # This doesn't belong in here
@@ -73,7 +73,7 @@ class add_limits(object):
             new_args.append(other)
 
 
-        r = e.new(*new_args)
+        r = e.func(*new_args)
         return r
 
     
@@ -117,7 +117,7 @@ def decompose(e):
         new_args.append(other)
 
 
-    r = e.new(*new_args)
+    r = e.func(*new_args)
     return r
         
 
