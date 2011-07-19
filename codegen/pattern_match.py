@@ -1,35 +1,49 @@
 
-from sympy import *
-
 class AutoVarInstance(object):
+    """Placeholder for binding an AutoVar member."""
     def __init__(self, parent, name):
         self.parent = parent
         self.name = name
 
+    def bind_value(self, name, e):
+        self.parent.bind_value(name, e)
+
+
 class AutoVar(object):
-    '''Access any member variable to return an AutoVarInstance object that can be used
-       to bind it to a value later'''
-    def __init__(self):
-        self.vars = []
+    """
+    Tracks member variables for later binding and use.
+
+    Access any member variable and it will return an AutoVarInstance object
+    that can bind it to a value later.
+    """
+
     def __getattr__(self,name):
-        self.vars.append(name)
         return AutoVarInstance(self,name)
+
+    def bind_value(self, name, e):
+        self.__dict__[name] = e
 
 
 class Match(object):
-    def __init__(self, expr, indent=0):
+    """
+    Match patterns in an expression tree.
+    """
+
+    def __init__(self, expr):
         self.expr = expr
-        self.indent = indent
+
     def type(self, value):
-        '''Match on the type of the expression type'''
+        """Match on the type of the expression type.
+           Used for matching all functions."""
         return isinstance(type(self.expr),value)
 
     def exact(self, value):
-        '''Match exact values, for singletons'''
+        """Match exact values, for singletons."""
         return value == self.expr
 
     def __call__(self, *args):
-        '''Match on first arg as an expression type, next args bind to expression args'''
+        """Match on first argument as an expression type.
+           Next arguments bind to expression arguments."""
         match = True
         if len(args) > 0:
             match = isinstance(self.expr,args[0])
@@ -44,8 +58,8 @@ class Match(object):
         vars_to_bind = []
         for a,e in zip(args[1:], expr_args):
             if isinstance(a,tuple):
-                m = Match(e,self.indent+1)
-                match &=  m(*a)
+                m = Match(e)
+                match &= m(*a)
             elif isinstance(a, AutoVarInstance):
                 vars_to_bind.append( (a, a.name, e) )
             else:
@@ -54,16 +68,7 @@ class Match(object):
                 break
         if match:
             for a,name,e in vars_to_bind:
-                a.parent.__dict__[name] = e
+                a.bind_value(name,e)
 
         return match
-
-
-
-if __name__ == '__main__':
-    pass
-
- 
-
-
 
