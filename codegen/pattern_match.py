@@ -27,6 +27,35 @@ class AutoVar(object):
 class Match(object):
     """
     Match patterns in an expression tree.
+
+    Pass the expression to match in the constructor.
+    Matching is done with the following methods, which return a boolean:
+        __call__ - used most frequently.  First argument is the type
+                   of the expression.  Subsequent arguments can be
+                   AutoVar members (can be used once match suceeds),
+                   values (which match exactly), or tuples (perform
+                   a nested match)
+        type - match on the type of the type of expression (for matching
+               all functions).  
+        exact - match on value (rather than type) of expression.  Used for
+                Singleton values.
+
+    m = Match(e)
+    v = AutoVar()
+    if m(Add, v.e1, v.e2):
+        # use v.e1 and v.e2
+
+    # Nested match
+    if m(Add, (Mul, S.NegativeOne, v.e1), v.e2):
+        # use v.e1 and v.e2
+        ...
+
+    if m.type(FunctionClass):
+        pass
+
+    if m.exact(S.Half):
+        pass
+
     """
 
     def __init__(self, expr):
