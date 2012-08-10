@@ -1,6 +1,6 @@
 
-from sympy.prototype.codegen.lang_c import *
-from sympy.prototype.codegen.sympy_to_c import expr_to_c
+from derivation_modeling.codegen.lang_c import *
+from derivation_modeling.codegen.sympy_to_c import expr_to_c
 from sympy import Symbol, sympify
 
 def test_var():

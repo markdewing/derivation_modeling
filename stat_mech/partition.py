@@ -4,7 +4,7 @@
 # parition function
 
 from sympy import Symbol, Integral, exp
-from sympy.prototype.derivation import derivation, definition, replace_definition
+from derivation_modeling.derivation import derivation, definition, replace_definition
 
 Z = Symbol('Z')
 T = Symbol('T')

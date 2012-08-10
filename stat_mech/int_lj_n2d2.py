@@ -1,8 +1,8 @@
 
 from lj import lj_pot
 from specialize_n2d2 import n2,V12,r_12
-from sympy.prototype.derivation import replace, compute_children, all_to_xhtml
-from sympy.prototype.vector_utils import replace_func
+from derivation_modeling.derivation import replace, compute_children, all_to_xhtml
+from derivation_modeling.vector_utils import replace_func
 
 from sympy import Symbol, sqrt, Integral
 

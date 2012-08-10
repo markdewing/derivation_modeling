@@ -1,10 +1,10 @@
 
-from sympy.prototype.vector import Vector, VectorMagnitude
+from derivation_modeling.util.vector import Vector, VectorMagnitude
 from sympy import Symbol, Expr, Basic, Tuple, Add, Mul, S, Function, Abs, FunctionClass
 from sympy.tensor import Indexed, IndexedBase, Idx
 from sympy.integrals import Integral
 from sympy.functions import sqrt
-from codegen.pattern_match import AutoVar,AutoVarInstance,Match
+from derivation_modeling.codegen.pattern_match import AutoVar,AutoVarInstance,Match
 
 
 def is_vector(e):

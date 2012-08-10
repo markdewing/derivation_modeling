@@ -3,9 +3,9 @@
 # this should form another page listing - specializing to N = 2 in 2 dimensions
 
 from sympy import Symbol, Integral, exp, Function, Abs, Eq
-from sympy.prototype.vector import Vector, VectorMagnitude
-from sympy.prototype.vector_utils import decompose, add_limits, replace_func
-from sympy.prototype.derivation import derivation, definition, replace_definition, specialize_integral, replace, do_integral, identity
+from derivation_modeling.util.vector import Vector, VectorMagnitude
+from derivation_modeling.util.vector_utils import decompose, add_limits, replace_func
+from derivation_modeling.derivation import derivation, definition, replace_definition, specialize_integral, replace, do_integral, identity
 from partition import partition_function, beta_def, R, V
 
 r1 = Vector('r1',dim=2)

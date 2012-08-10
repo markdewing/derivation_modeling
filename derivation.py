@@ -1,6 +1,6 @@
 
 from sympy import Eq, Function, Symbol, diff, sympify, print_gtk, solve, Integral, simplify, printing
-from xml_util import xml_doc
+from derivation_modeling.util.xml_util import xml_doc
 import codecs
 import sys
 

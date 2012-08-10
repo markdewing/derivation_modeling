@@ -1,8 +1,8 @@
 
 from trapezoid import trap,definition_of_h
-from sympy.prototype.codegen import sympy_to_py
-from sympy.prototype.codegen import lang_py
-from sympy.prototype.codegen.lang_py import py_expr,py_var
+from derivation_modeling.codegen import sympy_to_py
+from derivation_modeling.codegen import lang_py
+from derivation_modeling.codegen.lang_py import py_expr,py_var
 import sympy
 
 

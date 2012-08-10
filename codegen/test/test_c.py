@@ -1,5 +1,5 @@
 
-from sympy.prototype.codegen.lang_c import *
+from derivation_modeling.codegen.lang_c import *
 
 def test_var():
     a = c_var('a')

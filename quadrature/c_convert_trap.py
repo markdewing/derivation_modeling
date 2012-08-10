@@ -1,7 +1,7 @@
 
-from sympy.prototype.quadrature.trapezoid import trap,definition_of_h
-from sympy.prototype.codegen import sympy_to_c
-from sympy.prototype.codegen import lang_c
+from derivation_modeling.quadrature.trapezoid import trap,definition_of_h
+from derivation_modeling.codegen import sympy_to_c
+from derivation_modeling.codegen import lang_c
 import sympy
 
 

@@ -1,7 +1,7 @@
 
 from sympy import *
-from sympy.prototype.codegen.lang_py import *
-from sympy.prototype.codegen.sympy_to_py import *
+from derivation_modeling.codegen.lang_py import *
+from derivation_modeling.codegen.sympy_to_py import *
 
 # convert an integral
 def convert_main(e, transforms=[]):

@@ -1,5 +1,5 @@
 
-from sympy.prototype.codegen.pattern_match import Match, AutoVar
+from derivation_modeling.codegen.pattern_match import Match, AutoVar
 from sympy import Symbol, Add, Mul, S, FunctionClass, Function, numbers, \
     Integer, Float
 

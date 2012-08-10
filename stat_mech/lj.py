@@ -1,6 +1,6 @@
 
 from sympy import Symbol, Function
-from sympy.prototype.derivation import derivation
+from derivation_modeling.derivation import derivation
 
 r = Symbol('r')
 V = Symbol('V')

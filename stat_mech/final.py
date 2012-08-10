@@ -1,6 +1,6 @@
 
 from int_gen import convert_integral, convert_main
-from sympy.prototype.codegen.sympy_to_py import expr_to_py
+from derivation_modeling.codegen.sympy_to_py import expr_to_py
 from int_lj_n2d2 import lj_n2
 #from int_lj_n2d3 import lj_n2
 #from int_lj_n3d2 import lj_n2

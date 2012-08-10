@@ -22,11 +22,12 @@ Contents
 
 derivation.py - model a derivation and all various operational steps
 
-vector.py - just enough to model a vector
-vector_utils.py -  utilities to decompose an expression involving vectors in vector components, and some
+util
+  vector.py - just enough to model a vector
+  vector_utils.py -  utilities to decompose an expression involving vectors in vector components, and some
          others that have nothing to do with vectors.
 
-xml_util.py - utilities for building an MathML document
+  xml_util.py - utilities for building an MathML document
 
 quadrature/
   sum_util.py - utilities for manipulating sums

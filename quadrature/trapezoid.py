@@ -4,7 +4,7 @@
 from sympy import Symbol, Sum, Function, Eq
 from sympy.tensor import Indexed, Idx, IndexedBase
 from sympy.utilities.iterables import preorder_traversal
-from sympy.prototype.derivation import derivation,identity
+from derivation_modeling.derivation import derivation,identity
 from sum_util import peel_n
 
 i = Symbol('i',integer=True)

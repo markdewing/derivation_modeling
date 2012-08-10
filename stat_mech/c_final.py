@@ -1,7 +1,7 @@
 
-from sympy.prototype.stat_mech.c_int_gen import convert_integral
-from sympy.prototype.codegen.lang_c import *
-from sympy.prototype.stat_mech.int_lj_n2d2 import lj_n2
+from derivation_modeling.stat_mech.c_int_gen import convert_integral
+from derivation_modeling.codegen.lang_c import *
+from derivation_modeling.stat_mech.int_lj_n2d2 import lj_n2
 #from gen_int_lj_n2d2 import lj_n2
 
 #from en_lj_n2d2 import en_lj_n2

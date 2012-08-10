@@ -1,8 +1,8 @@
 
 from sympy import *
-from sympy.prototype.codegen.lang_c import *
-from sympy.prototype.codegen.sympy_to_c import *
-from sympy.prototype.codegen.transforms import extract_integrals
+from derivation_modeling.codegen.lang_c import *
+from derivation_modeling.codegen.sympy_to_c import *
+from derivation_modeling.codegen.transforms import extract_integrals
 
 # convert an integral
 
